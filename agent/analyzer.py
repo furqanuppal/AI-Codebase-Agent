@@ -7,7 +7,7 @@ load_dotenv()
 client = AzureOpenAI(
     api_key="*****************************************",
     api_version="************",
-    azure_endpoint="********************************"
+    azure_endpoint="**********************************"
 )
 
 deployment_name = "gpt-4o"
