@@ -26,13 +26,13 @@ def generate_project_summary(file_summaries):
 You are an AI Software Analyst. Based on the following file summaries, generate a high-level summary of the entire project. Write it in 2 paragraphs max.
 
 File Summaries:
-{combined[:8000]}
+{combined[:20000]}
 '''
     response = client.chat.completions.create(
         model=deployment_name,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,
-        max_tokens=700
+        max_tokens=2500
     )
     
     print("\nGPT raw response:")
