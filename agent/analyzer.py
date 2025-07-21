@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 client = AzureOpenAI(
-    api_key="*****************************************",
-    api_version="************",
-    azure_endpoint="**********************************"
+    api_key="EkkatBw5ktWZPOs3unXeiH5lNAKpMAYOYJqQuaOpiAGjDHDY4xZUJQQJ99BGACYeBjFXJ3w3AAAAACOGtZUY",
+    api_version="2024-12-01-preview",
+    azure_endpoint="https://data-ai-interns.cognitiveservices.azure.com/"
 )
 
 deployment_name = "gpt-4o"
@@ -47,4 +47,3 @@ Provide:
     print(f"🧠 Summary from GPT for {file_path}:\n{summary_text}")
 
     return summary_text
-
