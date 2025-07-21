@@ -30,7 +30,7 @@ Provide:
         model=deployment_name,
         messages=[{'role': 'user', 'content': prompt}],
         temperature = 0.3,
-        max_tokens = 700
+        max_tokens = 2500
     )
 
     print("\nGPT raw response:")
