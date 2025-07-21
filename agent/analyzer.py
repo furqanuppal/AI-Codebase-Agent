@@ -1,8 +1,5 @@
 import os
 from openai import AzureOpenAI
-from dotenv import load_dotenv
-
-load_dotenv()
 
 client = AzureOpenAI(
     api_key="EkkatBw5ktWZPOs3unXeiH5lNAKpMAYOYJqQuaOpiAGjDHDY4xZUJQQJ99BGACYeBjFXJ3w3AAAAACOGtZUY",
