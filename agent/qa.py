@@ -19,7 +19,7 @@ Question:
         model = deployment_name,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,
-        max_tokens=700
+        max_tokens=2500
     )
 
     return response.choices[0].message.content.strip()
