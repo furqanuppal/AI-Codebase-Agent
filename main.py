@@ -1,64 +1,77 @@
 # Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process
 # .\venv\Scripts\Activate.ps1
- 
+
 import sys
-from agent.repo_handler import clone_repo, read_code_files
+from dotenv import load_dotenv
+from agent.repo_handler import clone_repo, read_code_files, filter_files_by_path
 from agent.summarizer import summarize_repo, generate_project_summary
 from agent.readme_generator import generate_readme
 from agent.qa import answer_question
+
+load_dotenv()
 
 def main():
     if len(sys.argv) < 2:
         print("Usage: python main.py <Github Repo URL>")
         return
-    
+
     repo_url = sys.argv[1]
     repo_path = clone_repo(repo_url)
     code_files = read_code_files(repo_path)
-    print(f"Total code files read: {len(code_files)}")
-    print("Files:")
-    for f in list(code_files.keys())[:5]:
-        print(f" - {f}")
 
-    file_summaries = summarize_repo(code_files)
-    print(f"Total file summaries generated: {len(file_summaries)}")
+    print(f"\n📁 Repo cloned. Total readable code/text files: {len(code_files)}")
 
+    # Ask user what to summarize
+    print("\nWhat do you want to summarize?")
+    summary_scope = input("Enter folder name, file name, or 'all': ").strip().lower()
 
-    project_summary = generate_project_summary(file_summaries)
-    readme_content = generate_readme(project_summary, file_summaries)
+    if summary_scope == "all":
+        files_to_summarize = code_files
+    else:
+        files_to_summarize = filter_files_by_path(code_files, summary_scope)
 
-    with open("project_summary.txt", "w", encoding="utf-8") as f:
-        f.write(project_summary)
+    if not files_to_summarize:
+        print(f"⚠️ No matching files found for '{summary_scope}'. Exiting.")
+        return
+
+    print(f"\n🔍 Found {len(files_to_summarize)} matching files. Starting summarization...")
+
+    file_summaries = summarize_repo(files_to_summarize)
 
     with open("file_summaries.txt", "w", encoding="utf-8") as f:
         for path, summary in file_summaries.items():
             f.write(f"\n--- {path} ---\n{summary}\n")
-            print(f"\n--- {path} ---\n{summary}\n")
 
-    with open("README_GENERATED.md", "w", encoding="utf-8") as f:
-        f.write(readme_content)
+    print("\n✅ Summarization complete. File: file_summaries.txt")
 
-    print("Summarization complete. Outputs saved to:")
-    print(" - project_summary.txt")
-    print(" - file_summaries.txt")
-    print(" - README_GENERATED.md")
+    # Ask if project summary is needed
+    ask_summary = input("\nDo you want a high-level project summary as well? (yes/no): ").strip().lower()
+    if ask_summary == "yes":
+        project_summary = generate_project_summary(file_summaries)
+        with open("project_summary.txt", "w", encoding="utf-8") as f:
+            f.write(project_summary)
+        print("📝 Project summary saved to: project_summary.txt")
 
-    # Interactively ask questions
-    print("\n✅ You can now ask questions about the codebase!")
+        readme_content = generate_readme(project_summary, file_summaries)
+        with open("README_GENERATED.md", "w", encoding="utf-8") as f:
+            f.write(readme_content)
+        print("📄 README_GENERATED.md created.")
+
+    # Q&A session
+    print("\nYou can now ask questions about the codebase (summarized or not).")
     while True:
         q = input("\nAsk a question (or type 'exit' to quit): ").strip()
         if q.lower() == 'exit':
-            print("Exiting Q&A session.")
+            print("Exiting.")
             break
-        if q == "":
+        if not q:
             print("⚠️ Please enter a valid question.")
             continue
         try:
-            answer = answer_question(q, file_summaries)
+            answer = answer_question(q, file_summaries, repo_path)
             print(f"\nAnswer:\n{answer}")
         except Exception as e:
             print(f"Error while answering: {e}")
-
 
 if __name__ == "__main__":
     main()
